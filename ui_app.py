@@ -11,14 +11,9 @@ except ModuleNotFoundError:  # pragma: no cover - optional dependency
         """Stub if python-dotenv is not installed."""
         pass
 
-try:
-    from flask import Flask, Response
-except ModuleNotFoundError as exc:  # pragma: no cover - missing dependency
-    raise RuntimeError("Flask must be installed to run the web UI") from exc
+from wsgiref.simple_server import make_server
 
 load_dotenv()
-
-app = Flask(__name__)
 
 _log: list[str] = []
 _log_lock = threading.Lock()
@@ -93,9 +88,7 @@ def _run_task(func: Callable[[], Any], name: str) -> None:
     threading.Thread(target=target, daemon=True).start()
 
 
-@app.route("/")
-def index() -> str:
-    return """<!doctype html>
+INDEX_HTML = """<!doctype html>
 <html lang='en'>
 <head>
 <meta charset='utf-8'>
@@ -121,27 +114,40 @@ setInterval(update,1000);
 </html>"""
 
 
-@app.post("/run/<task>")
-def run(task: str) -> tuple[str, int]:
-    mapping: dict[str, tuple[Callable[[], Any], str]] = {
-        "train": (train_agent, "Train"),
-        "paper": (run_paper, "Paper Trade"),
-        "live": (run_live, "Live Trade"),
-    }
-    item = mapping.get(task)
-    if not item:
-        return "Unknown task", 400
-    _run_task(*item)
-    return "", 204
+def application(environ: dict[str, Any], start_response: Callable[..., Any]):
+    method = environ.get("REQUEST_METHOD", "GET")
+    path = environ.get("PATH_INFO", "/")
 
+    if method == "GET" and path == "/":
+        start_response("200 OK", [("Content-Type", "text/html; charset=utf-8")])
+        return [INDEX_HTML.encode()]
 
-@app.get("/log")
-def log_view() -> Response:
-    return Response(_log_text(), mimetype="text/plain")
+    if method == "GET" and path == "/log":
+        start_response("200 OK", [("Content-Type", "text/plain; charset=utf-8")])
+        return [_log_text().encode()]
+
+    if method == "POST" and path.startswith("/run/"):
+        task = path.split("/")[-1]
+        mapping: dict[str, tuple[Callable[[], Any], str]] = {
+            "train": (train_agent, "Train"),
+            "paper": (run_paper, "Paper Trade"),
+            "live": (run_live, "Live Trade"),
+        }
+        item = mapping.get(task)
+        if not item:
+            start_response("400 Bad Request", [("Content-Type", "text/plain")])
+            return [b"Unknown task"]
+        _run_task(*item)
+        start_response("204 No Content", [])
+        return [b""]
+
+    start_response("404 Not Found", [("Content-Type", "text/plain")])
+    return [b"Not Found"]
 
 
 def main() -> None:
-    app.run(host="0.0.0.0", port=8000)
+    with make_server("0.0.0.0", 8000, application) as server:
+        server.serve_forever()
 
 
 if __name__ == "__main__":  # pragma: no cover - manual execution

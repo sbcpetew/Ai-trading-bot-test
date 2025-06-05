@@ -10,7 +10,6 @@ torch = "*"
 gym = "*"
 redis = "*"
 websockets = "*"
-Flask = "*"
 python-dotenv = "*"
 
 [tool.poetry.dev-dependencies]

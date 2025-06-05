@@ -2,5 +2,4 @@ torch
 gym
 redis
 websockets
-Flask
 python-dotenv
