@@ -14,7 +14,12 @@ class TradingEnv(gym.Env):
         self.position = 0  # -1 short, 0 flat, 1 long
         self.balance = 0.0
         self.action_space = spaces.Discrete(3)  # short, flat, long
-        self.observation_space = spaces.Box(-np.inf, np.inf, shape=(len(data.columns),))
+        self.observation_space = spaces.Box(
+            -np.inf,
+            np.inf,
+            shape=(len(data.columns),),
+            dtype=np.float32,
+        )
 
     def reset(self):
         self.current_step = 0
@@ -33,6 +38,7 @@ class TradingEnv(gym.Env):
 
         price = self.data.iloc[self.current_step]["close"]
         next_price = self.data.iloc[self.current_step + 1]["close"]
+        prev_balance = self.balance
         if action == 2:  # long
             self.balance += next_price - price
             self.position = 1
@@ -42,6 +48,6 @@ class TradingEnv(gym.Env):
         else:
             self.position = 0
         self.current_step += 1
-        reward = self.balance
+        reward = self.balance - prev_balance
         done = self.current_step >= len(self.data) - 1
         return self._get_obs(), reward, done, {}

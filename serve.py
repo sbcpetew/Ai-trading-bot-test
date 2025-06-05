@@ -1,7 +1,7 @@
 import asyncio
 from typing import Dict
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
@@ -49,6 +49,9 @@ async def index():
 @app.websocket("/ws/metrics")
 async def ws_metrics(ws: WebSocket):
     await ws.accept()
-    while True:
-        await ws.send_json(metrics)
-        await asyncio.sleep(1)
+    try:
+        while True:
+            await ws.send_json(metrics)
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        pass

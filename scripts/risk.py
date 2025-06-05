@@ -9,4 +9,4 @@ def calc_contracts(
     contracts = int(
         min(alpha * kelly * 0.25 * equity / stop_tick_value, max_risk / stop_tick_value)
     )
-    return max(1, contracts)
+    return max(0, contracts)
