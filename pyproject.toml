@@ -5,12 +5,13 @@ description = "AlphaFive RL trading bot"
 authors = ["AI"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.8"
 torch = "*"
 gym = "*"
 redis = "*"
 websockets = "*"
 Flask = "*"
+python-dotenv = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

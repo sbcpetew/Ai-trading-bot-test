@@ -3,11 +3,15 @@
 block_cipher = None
 
 
+import os
+
+extra_datas = [('.env', '.')] if os.path.exists('.env') else []
+
 a = Analysis(
     ['ui_app.py'],
     pathex=[],
     binaries=[],
-    datas=[('.env', '.')],
+    datas=extra_datas,
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],

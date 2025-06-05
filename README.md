@@ -1,6 +1,6 @@
 # AlphaFive
 
-This repository contains a work-in-progress implementation of the AlphaFive trading system as described in the specification. The goal is to build an autonomous futures trading bot with strict risk controls.
+This repository contains a work-in-progress implementation of the AlphaFive trading system as described in the specification. The goal is to build an autonomous futures trading bot with strict risk controls. The code targets **Python 3.8+**.
 
 This project currently provides a minimal skeleton including CLI entry points and a simple web-based interface built with Flask.
 
