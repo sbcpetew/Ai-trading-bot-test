@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ai-trading-bot-test"
+version = "0.1.0"
+description = "RL trading bot skeleton"
+authors = ["Codex <codex@openai.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "*"
+pandas = "*"
+torch = "*"
+gym = "*"
+tqdm = "*"
+fastapi = "*"
+uvicorn = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
