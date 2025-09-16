@@ -1,0 +1,5 @@
+torch
+gym
+redis
+websockets
+python-dotenv
